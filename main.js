@@ -50,12 +50,43 @@ app.get('/search',
 
         const result = await fetch(url)
         const giphys = await result.json()
-
+        const data = giphys
         console.info('giphys: \n', giphys)
         
+        // search giphy, use await
+        /*
+        const imgs = []
+        for (let d of giphys.data) {
+            const title = d.title
+            const url = d.images.fixed_height.url 
+            imgs.push(
+                {title, url}  //mapping one object type to another
+                )
+        }
+        */
+
+
+        const imgs = giphys.data
+        .filter(      //takes an array and returns a reduced array
+            d => {
+                return !d.title.includes('f**k')
+            }
+        )
+        .map(           //.map takes an array and converts it into the same type
+            (d) => {
+                return {title: d.title, url: d.images.fixed_height.url}
+            })
+                        //.reduce takes an array and returns a value
+        console.info(imgs)
+
 
         res.status(200)
-        res.end()
+        res.type('text/html')
+        res.render('giphy', {
+            search, imgs,
+            //hasContent: imgs.length > 0
+            hasContent: !!imgs.length
+        })
 })
 
 if (API_KEY)
